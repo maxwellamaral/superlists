@@ -1,7 +1,7 @@
 """
 Views do aplicativo lists.
 """
-from django.http import HttpResponse
+from django.shortcuts import render
 
 
 def home_page(request):
@@ -9,4 +9,4 @@ def home_page(request):
     Página inicial.
     :return:
     """
-    return HttpResponse('<html><title>To-Do lists</title></html>')
+    return render(request, 'home.html')
