@@ -1,5 +1,11 @@
 """
 Views do aplicativo lists.
 """
+from django.shortcuts import render
 
-home_page = None
+def home_page():
+    """
+    Página inicial.
+    :return:
+    """
+    pass
