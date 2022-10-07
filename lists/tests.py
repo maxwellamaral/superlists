@@ -24,9 +24,11 @@ class HomePageTest(TestCase):
         Teste: a página inicial retorna o HTML correto
         :return:
         """
-        request = HttpRequest()
-        response = home_page(request)
+        response = self.client.get('/')
+
         html = response.content.decode('utf8')
         self.assertTrue(html.startswith('<html>'))
         self.assertIn('<title>To-Do lists</title>', html)
         self.assertTrue(html.endswith('</html>'))
+
+        self.assertTemplateUsed(response, 'home.html')
