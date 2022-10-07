@@ -55,14 +55,11 @@ class NewVisitorTest(unittest.TestCase):
         # Quando ela tecla enter, a página é atualizada, e agora a página lista
         # "1: Buy peacock feathers" como um item em uma lista de tarefas.
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(10)
+        time.sleep(5)
 
         table = self.browser.find_element(By.ID, 'id_list_table')
         rows = table.find_elements(By.TAG_NAME, 'tr')
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathers' for row in rows),
-            f"New to-do item did not appear in table -- its text was:\n{table.text}"
-        )
+        self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
 
         # Ainda continua havendo uma caixa de texto convidando-a a acrescentar outro item.
         # Ela insere "Use peacock feathers to make a fly" (Usar penas de pavão para fazer
