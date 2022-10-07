@@ -61,6 +61,7 @@ class NewVisitorTest(unittest.TestCase):
         rows = table.find_elements(By.TAG_NAME, 'tr')
         self.assertTrue(
             any(row.text == '1: Buy peacock feathers' for row in rows),
+            f"New to-do item did not appear in table -- its text was:\n{table.text}"
         )
 
         # Ainda continua havendo uma caixa de texto convidando-a a acrescentar outro item.
