@@ -17,7 +17,7 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
         self.assertTemplateUsed(response, 'home.html')
 
-    def test_can_save_a_POST_request(self):
+    def test_can_save_a_post_request(self):
         """
         Teste: pode salvar uma requisição POST
         :return:
@@ -28,10 +28,14 @@ class HomePageTest(TestCase):
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'A new list item')
 
-    def test_redirects_after_POST(self):
+    def test_redirects_after_post(self):
+        """
+        Teste: redireciona após POST
+        :return:
+        """
         response = self.client.post('/', data={'item_text': 'A new list item'})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
 
     def test_only_saves_items_when_necessary(self):
         """

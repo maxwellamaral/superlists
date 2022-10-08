@@ -9,6 +9,8 @@ from selenium.common import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
+from lists.models import Item
+
 MAX_WAIT = 10
 
 
@@ -198,3 +200,37 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertIn('Buy milk', page_text)
 
         # Satisfeitos, ambos voltam a dormir
+
+
+class ListViewTest(LiveServerTestCase):
+    """
+    Teste de visualização de lista
+    """
+
+    def setUp(self):
+        """
+        Configurações iniciais do caso de teste
+        :return:
+        """
+        self.browser = webdriver.Firefox()
+
+    def tearDown(self):
+        """
+        Finalização do caso de teste
+        :return:
+        """
+        self.browser.quit()
+
+    def test_displays_all_list_items(self):
+        """
+        Teste: O item da lista é exibido em todas as páginas
+        :return:
+        """
+        Item.objects.create(text='itemey 1')
+        Item.objects.create(text='itemey 2')
+
+        response = self.client.get('/lists/the-only-list-in-the-world/')
+
+        # * Lida com respostas e bytes de seu conteúdo.
+        self.assertContains(response, 'itemey 1')
+        self.assertContains(response, 'itemey 2')
