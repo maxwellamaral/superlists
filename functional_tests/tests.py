@@ -3,6 +3,7 @@ Testes funcionais do Django.
 """
 import time
 
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.common import WebDriverException
@@ -14,7 +15,7 @@ from lists.models import Item, List
 MAX_WAIT = 10
 
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
     """Teste de novo visitante."""
 
     def setUp(self):
