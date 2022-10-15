@@ -60,7 +60,7 @@ class ListAndItemModelsTest(TestCase):
         saved_items = Item.objects.all()
         self.assertEqual(saved_items.count(), 2)
 
-        # Verificando se os itens salvos especificamente são os mesmos que foram criados anteriormente. Neste caso
+        # Verificando se os itens salvos especificamente são os mesmos criados anteriormente. Neste caso
         # comparando um item por vez (cada campo)
         first_saved_item = saved_items[0]
         second_saved_item = saved_items[1]

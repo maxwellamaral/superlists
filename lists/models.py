@@ -9,3 +9,10 @@ class Item(models.Model):
     Modelo de item.
     """
     text = models.TextField(default='')
+
+
+class List(models.Model):
+    """
+    Modelo de lista.
+    """
+    pass
