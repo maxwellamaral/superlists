@@ -61,6 +61,23 @@ class NewVisitorTest(LiveServerTestCase):
                     raise exception
                 time.sleep(0.5)
 
+    def test_layout_and_styling(self):
+        """
+        Teste: Testa layout e estilização
+        :return:
+        """
+        # Edith acessa a página inicial
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # Ela percebe que a caixa de entrada está elegantemente centralizada
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=10
+        )
+
     def test_can_start_a_list_for_one_user(self):
         """
         Teste: Edith pode iniciar uma lista e recuperá-la mais tarde
