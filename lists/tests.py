@@ -35,9 +35,28 @@ class ListViewTest(TestCase):
         Teste: usa o modelo de lista
         :return:
         """
-        response = self.client.get('/lists/the-only-list-in-the-world/')
+        list_ = List.objects.create()
+        response = self.client.get(f'/lists/{list_.id}/')
         self.assertTemplateUsed(response, 'list.html')
 
+    def test_displays_only_items_for_that_list(self):
+        """
+        Teste: exibe apenas itens para essa lista
+        :return:
+        """
+        correct_list = List.objects.create()
+        Item.objects.create(text='itemey 1', list=correct_list)
+        Item.objects.create(text='itemey 2', list=correct_list)
+        other_list = List.objects.create()
+        Item.objects.create(text='outro item 1', list=other_list)
+        Item.objects.create(text='outro item 2', list=other_list)
+
+        response = self.client.get(f'/lists/{correct_list.id}/')
+
+        self.assertContains(response, 'itemey 1')
+        self.assertContains(response, 'itemey 2')
+        self.assertNotContains(response, 'outro item 1')
+        self.assertNotContains(response, 'outro item 2')
 
 class ListAndItemModelsTest(TestCase):
     """Teste de modelo de item."""
@@ -103,4 +122,5 @@ class NewListTest(TestCase):
         # * Vou substituir as duas linhas abaixo por uma linha só:
         # * self.assertEqual(response.status_code, 302)
         # * self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
-        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
+        new_list = List.objects.first()
+        self.assertRedirects(response, f'/lists/{new_list.id}/')

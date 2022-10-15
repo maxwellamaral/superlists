@@ -9,7 +9,7 @@ from selenium.common import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-from lists.models import Item
+from lists.models import Item, List
 
 MAX_WAIT = 10
 
@@ -177,10 +177,14 @@ class ListViewTest(LiveServerTestCase):
         Teste: O item da lista é exibido em todas as páginas
         :return:
         """
-        Item.objects.create(text='itemey 1')
-        Item.objects.create(text='itemey 2')
+        # Edith cria uma nova lista de tarefas
+        list_ = List.objects.create()
 
-        response = self.client.get('/lists/the-only-list-in-the-world/')
+        Item.objects.create(text='itemey 1', list=list_)
+        Item.objects.create(text='itemey 2', list=list_)
+
+        # Ela acessa a página inicial e vê que sua lista está lá
+        response = self.client.get(f'/lists/{list_.id}/')
         # * Lida com respostas e bytes de seu conteúdo.
         self.assertContains(response, 'itemey 1')
         self.assertContains(response, 'itemey 2')
