@@ -19,47 +19,6 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, 'home.html')
 
 
-class ListAndItemModelsTest(TestCase):
-    """Teste de modelo de item."""
-
-    def test_saving_and_retrieving_items(self):
-        """
-        Teste: salvando e recuperando listas e itens no modelo de dados
-        :return:
-        """
-        # Criando uma lista
-        list_ = List()
-        list_.save()
-
-        # Criando itens
-        first_item = Item()
-        first_item.text = 'The first (ever) list item'
-        first_item.list = list_
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = 'Item the second'
-        second_item.list = list_
-        second_item.save()
-
-        # Carregando listas e itens que constam no banco de dados até agora e verificando se elas são as mesmas criadas
-        # anteriormente. Neste caso, comparando um conjunto.
-        saved_list = List.objects.first()
-        self.assertEqual(saved_list, list_)
-
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-
-        # Verificando se os itens salvos especificamente são os mesmos criados anteriormente. Neste caso
-        # comparando um item por vez (cada campo)
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, 'The first (ever) list item')
-        self.assertEqual(first_saved_item.list, list_)
-        self.assertEqual(second_saved_item.text, 'Item the second')
-        self.assertEqual(second_saved_item.list, list_)
-
-
 class NewListTest(TestCase):
     """Teste de nova lista."""
 
@@ -74,8 +33,7 @@ class NewListTest(TestCase):
         self.assertEqual(new_item.text, 'A new list item')
 
 
-
-class ListAndItemModelsTest(TestCase):
+class ItemModelsTest(TestCase):
     """Teste de modelo de item."""
 
     def test_cannot_save_empty_list_items(self):
@@ -87,8 +45,73 @@ class ListAndItemModelsTest(TestCase):
         item = Item(list=list_, text='')
         with self.assertRaises(ValidationError):
             item.save()
-            item.full_clean()   # Força a validação em banco de dados sqlite.
+            item.full_clean()  # Força a validação em banco de dados sqlite.
 
+    def test_duplicate_items_are_invalid(self):
+        """
+        Teste: itens duplicados são inválidos
+        :return:
+        """
+        list_ = List.objects.create()
+        Item.objects.create(list=list_, text='bla')
+        with self.assertRaises(ValidationError):
+            item = Item(list=list_, text='bla')
+            item.full_clean()
+
+    def test_CAN_save_the_same_item_to_different_lists(self):
+        """
+        Teste: pode salvar o mesmo item em listas diferentes
+        :return:
+        """
+        list1 = List.objects.create()
+        list2 = List.objects.create()
+        Item.objects.create(list=list1, text='bla')
+        item = Item(list=list2, text='bla')
+        item.full_clean()  # Não deve gerar erro
+
+    def test_list_ordering(self):
+        """
+        Teste: ordenação de lista
+        :return:
+        """
+        list1 = List.objects.create()
+        item1 = Item.objects.create(list=list1, text='i1')
+        item2 = Item.objects.create(list=list1, text='item 2')
+        item3 = Item.objects.create(list=list1, text='3')
+        self.assertEqual(
+            list(Item.objects.all()),
+            [item1, item2, item3]
+        )
+
+    def test_string_representation(self):
+        """
+        Teste: representação de string
+        :return:
+        """
+        item = Item(text='some text')
+        self.assertEqual(str(item), 'some text')
+
+    def test_default_text(self):
+        """
+        Teste: texto padrão
+        :return:
+        """
+        item = Item()
+        self.assertEqual(item.text, '')
+
+    def test_item_is_related_to_list(self):
+        """
+        Teste: o item está relacionado à lista
+        :return:
+        """
+        list_ = List.objects.create()
+        item = Item()
+        item.list = list_
+        item.save()
+        self.assertIn(item, list_.item_set.all())
+
+
+class ListModelTest(TestCase):
     def test_get_absolute_url(self):
         """
         Teste: obter URL absoluta

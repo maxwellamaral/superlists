@@ -23,4 +23,15 @@ class Item(models.Model):
     text = models.TextField(default='')
     list = models.ForeignKey(List, default=None, null=True, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ('id',)
+        unique_together = ('list', 'text')
+
+    def __str__(self):
+        """
+        Representação de string.
+        :return:
+        """
+        return self.text
+
 
