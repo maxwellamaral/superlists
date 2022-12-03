@@ -6,7 +6,7 @@ from unittest import skip
 from django.test import TestCase
 from django.utils.html import escape
 
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, ExistingListItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR
 from lists.models import Item, List
 
 
@@ -135,7 +135,7 @@ class ListViewTest(TestCase):
         """
         list_ = List.objects.create()
         response = self.client.get(f'/lists/{list_.id}/')
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
 
     def post_invalid_input(self):
@@ -172,9 +172,9 @@ class ListViewTest(TestCase):
         :return:
         """
         response = self.post_invalid_input()
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
-    @skip
+
     def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
         """
         Teste: erros de validação de itens duplicados terminam na página de listas

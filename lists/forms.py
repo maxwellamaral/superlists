@@ -60,3 +60,10 @@ class ExistingListItemForm(ItemForm):
         except forms.ValidationError as e:
             e.error_dict = {'text': [DUPLICATE_ITEM_ERROR]}
             self._update_errors(e)
+
+    def save(self):
+        """
+        Salva o formulário.
+        :return:
+        """
+        return forms.models.ModelForm.save(self)
