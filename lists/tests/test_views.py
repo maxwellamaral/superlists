@@ -4,6 +4,7 @@ Testes de unidade do aplicativo lists.
 from django.test import TestCase
 from django.utils.html import escape
 
+from lists.forms import ItemForm
 from lists.models import Item, List
 
 
@@ -124,3 +125,23 @@ class ListViewTest(TestCase):
         self.assertTemplateUsed(response, 'list.html')
         expected_error = escape("You can't have an empty list item")
         self.assertContains(response, expected_error)
+
+
+class HomePageTest(TestCase):
+    """Teste da página inicial."""
+
+    def test_uses_home_template(self):
+        """
+        Teste: usa o modelo da página inicial
+        :return:
+        """
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
+
+    def test_home_page_uses_item_form(self):
+        """
+        Teste: a página inicial usa o formulário de itens
+        :return:
+        """
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)

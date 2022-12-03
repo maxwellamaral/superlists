@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
 
 from lists.models import Item, List
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR
 
 
 def home_page(request):
@@ -12,7 +13,7 @@ def home_page(request):
     Página inicial.
     :return:
     """
-    return render(request, 'home.html')
+    return render(request, 'home.html', {'form': ItemForm()})
 
 
 def view_list(request, list_id):
