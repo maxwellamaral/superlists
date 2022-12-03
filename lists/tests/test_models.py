@@ -1,6 +1,7 @@
 """
 Testes de unidade do aplicativo lists.
 """
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from lists.models import Item, List
@@ -119,3 +120,18 @@ class NewItemTest(TestCase):
 
         response = self.client.get(f'/lists/{correct_list.id}/')
         self.assertEqual(response.context['list'], correct_list)
+
+
+class ListAndItemModelsTest(TestCase):
+    """Teste de modelo de item."""
+
+    def test_cannot_save_empty_list_items(self):
+        """
+        Teste: não pode salvar itens de lista vazios
+        :return:
+        """
+        list_ = List.objects.create()
+        item = Item(list=list_, text='')
+        with self.assertRaises(ValidationError):
+            item.save()
+            item.full_clean()   # Força a validação em banco de dados sqlite.

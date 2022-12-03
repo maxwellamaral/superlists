@@ -2,6 +2,7 @@
 Testes de unidade do aplicativo lists.
 """
 from django.test import TestCase
+from django.utils.html import escape
 
 from lists.models import Item, List
 
@@ -45,3 +46,23 @@ class ListViewTest(TestCase):
         self.assertContains(response, 'itemey 2')
         self.assertNotContains(response, 'outro item 1')
         self.assertNotContains(response, 'outro item 2')
+
+    def test_validation_errors_are_sent_back_to_home_page_template(self):
+        """
+        Teste: erros de validação são enviados de volta ao modelo da página inicial
+        :return:
+        """
+        response = self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+        expected_error = escape("You can't have an empty list item")
+        self.assertContains(response, expected_error)
+
+    def test_invalid_list_items_arent_saved(self):
+        """
+        Teste: itens de lista inválidos não são salvos
+        :return:
+        """
+        self.client.post('/lists/new', data={'item_text': ''})
+        self.assertEqual(List.objects.count(), 0)
+        self.assertEqual(Item.objects.count(), 0)
