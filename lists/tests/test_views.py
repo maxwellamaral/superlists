@@ -4,7 +4,7 @@ Testes de unidade do aplicativo lists.
 from django.test import TestCase
 from django.utils.html import escape
 
-from lists.forms import ItemForm
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR
 from lists.models import Item, List
 
 
@@ -126,6 +126,52 @@ class ListViewTest(TestCase):
         expected_error = escape("You can't have an empty list item")
         self.assertContains(response, expected_error)
 
+    def test_display_item_form(self):
+        """
+        Teste: exibe o formulário de item
+        :return:
+        """
+        list_ = List.objects.create()
+        response = self.client.get(f'/lists/{list_.id}/')
+        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertContains(response, 'name="text"')
+
+    def post_invalid_input(self):
+        """
+        Post: entrada inválida
+        :return:
+        """
+        list_ = List.objects.create()
+        return self.client.post(
+            f'/lists/{list_.id}/',
+            data={'text': ''}
+        )
+
+    def test_for_invalid_input_nothing_saved_to_db(self):
+        """
+        Teste: para entrada inválida, nada é salvo no banco de dados
+        :return:
+        """
+        self.post_invalid_input()
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_for_invalid_input_renders_list_template(self):
+        """
+        Teste: para entrada inválida, renderiza o modelo de lista
+        :return:
+        """
+        response = self.post_invalid_input()
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'list.html')
+
+    def test_for_invalid_input_passes_form_to_template(self):
+        """
+        Teste: para entrada inválida, passa o formulário para o modelo
+        :return:
+        """
+        response = self.post_invalid_input()
+        self.assertIsInstance(response.context['form'], ItemForm)
+
 
 class HomePageTest(TestCase):
     """Teste da página inicial."""
@@ -144,4 +190,46 @@ class HomePageTest(TestCase):
         :return:
         """
         response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
+
+
+class NewListTest(TestCase):
+    """Teste de nova lista."""
+
+    def test_validation_errors_are_sent_back_to_home_page_template(self):
+        """
+        Teste: erros de validação são enviados de volta ao modelo da página inicial
+        :return:
+        """
+        response = self.client.post('/lists/new', data={'text': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+        expected_error = escape("You can't have an empty list item")
+        self.assertContains(response, expected_error)
+
+    def test_for_invalid_input_renders_home_template(self):
+        """
+        Teste: para entrada inválida, renderiza o modelo da página inicial
+        :return:
+        """
+        response = self.client.post('/lists/new', data={'text': ''})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
+
+    def test_validation_errors_are_shown_on_home_page(self):
+        """
+        Teste: para entrada inválida, erros de validação são mostrados na página inicial
+        :return:
+        """
+        response = self.client.post('/lists/new', data={'text': ''})
+        self.assertContains(response, escape(EMPTY_ITEM_ERROR))
+
+    def test_for_invalid_input_passes_form_to_template(self):
+        """
+        Teste: para entrada inválida, passa o formulário para o modelo
+        :return:
+        """
+        response = self.client.post('/lists/new', data={'text': ''})
+
+        # ! assertIsInstance é usado para verificar se o objeto é uma instância de uma classe
         self.assertIsInstance(response.context['form'], ItemForm)

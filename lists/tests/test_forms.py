@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils.html import escape
 
 from lists.forms import ItemForm, EMPTY_ITEM_ERROR
 
@@ -24,4 +25,4 @@ class ItemFormTest(TestCase):
         """
         form = ItemForm(data={'text': '', 'name': 'Max'})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['text'], EMPTY_ITEM_ERROR)
+        self.assertEqual(form.errors['text'], [EMPTY_ITEM_ERROR])
