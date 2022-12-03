@@ -88,3 +88,11 @@ class ListAndItemModelsTest(TestCase):
         with self.assertRaises(ValidationError):
             item.save()
             item.full_clean()   # Força a validação em banco de dados sqlite.
+
+    def test_get_absolute_url(self):
+        """
+        Teste: obter URL absoluta
+        :return:
+        """
+        list_ = List.objects.create()
+        self.assertEqual(list_.get_absolute_url(), f'/lists/{list_.id}/')

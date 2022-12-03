@@ -2,13 +2,19 @@
 Arquivo de modelo para o aplicativo lists.
 """
 from django.db import models
+from django.urls import reverse
 
 
 class List(models.Model):
     """
     Modelo de lista.
     """
-    pass
+    def get_absolute_url(self):
+        """
+        Obter URL absoluta.
+        :return:
+        """
+        return reverse('view_list', args=[self.id])
 
 class Item(models.Model):
     """
